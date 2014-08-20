@@ -1,7 +1,7 @@
 ⍝ a JSON parser
 ⍝
 ⍝ usage:
-⍝   json←import'json'
+⍝   json←import'json.dyalog'
 ⍝   json.parse'{"abc": [123, true, null, [], {}]}'
 ⍝
 ⍝ JSON objects are represented as namespaces.  The parser fails if some key is not a valid APL identifier.
