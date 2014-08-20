@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# rundyalog is intended to be used as a hashbang interpreter for APL scripts like so:
+#   #!/usr/bin/env rundyalog
+# Make sure it is on your $PATH
+#
+# It does several things:
+#   * runs dyalog with the -script option and executes some bootstrapping code
+#   * loads the content of your APL script and executes it
+#   * ignores the first line of your script if it starts with #!
+#   * wraps your APL code in an immediately invoked tradfn, so your code can contain multiline dfns
+#   * ensures sensible defaults for variables like ⎕io and ⎕ct
+#   * provides an "import" function that your script can use to load other scripts as namespace references
+#   * calls ⎕off at the end to ensure a default exit code of 0 (this is a bug that will be fixed in v14.1)
+
+apl -script <<.
+  ⎕io⎕ct⎕pw←0 0 32767
+  ∇main;import;names;values
+    names←values←⍬ ⍝ module names (absolute paths---strings) and module values (namespace references)
+    import←{
+      name←⍺,⍵
+      i←names⍳⊂name
+      i<≢names:values[i]
+      names,←⊂name
+      values,←m←⎕ns''
+      m.import←({⍵↓⍨-'/'⍳⍨⌽⍵}name)∘#.import
+      src←{((⊂'#!')≢¨2↑¨⍵)/⍵}{⎕ml←3⋄(⍵≠⎕ucs 10)⊂⍵}'UTF-8'⎕ucs 256|83 ¯1⎕map name
+      _0←m.⎕fx(⊂'_R←_init'),src,⊂'_R←0' ⍝ wrap in a tradfn
+      _1←m._init
+      _2←m.⎕ex'_init'
+      m
+    }
+    _3←''import'$1'
+  ∇
+  main
+  ⎕off
+.
