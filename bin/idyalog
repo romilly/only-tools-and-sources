@@ -2,6 +2,8 @@
 # A libreadline-based REPL wrapper around Dyalog's interpreter.
 # Requires NodeJS and CoffeeScript.
 
+process.stdout.write '      ' # create illusion of instant startup; any input will be buffered for when the interpreter starts
+
 completions = '''
   ⎕á ⎕a ⎕ai ⎕an ⎕arbin ⎕arbout ⎕at ⎕av ⎕avu ⎕base ⎕class ⎕clear ⎕cmd ⎕cr ⎕cs
   ⎕ct ⎕cy ⎕d ⎕dct ⎕df ⎕div ⎕dl ⎕dm ⎕dmx ⎕dq ⎕dr ⎕ed ⎕em ⎕en ⎕ex ⎕exception
@@ -19,20 +21,21 @@ completions = '''
   )methods )ns )objects )obs )off )ops )pcopy )props )reset )save )sh )si )sic
   )sinl )tid )vars )wsid )xload
 '''.split /[ \n]+/
+completer = (line) -> w = line.replace /^.*([⎕\)]\w*)$/, '$1'; [completions.filter((c) -> !c.indexOf w), w]
 
 p = require('child_process').spawn 'apl', ['-q', '-script']
-bell = 7 # the Unicode code point that tells us when to show the 6-space prompt
+bell = 7 # the Unicode code point that tells us when to show a 6-space prompt
 p.stdin.write "⎕io⎕ct←0⋄⎕pw←32767⋄{}8835⌶2 #{bell}\n"
-[['stdout', 33], ['stderr', 31]].forEach ([stream, colour]) ->
+readline = require 'readline'
+rl = null # readline instance
+[['stdout', 33], ['stderr', 31]].forEach ([stream, colour]) -> # stdout in yellow, stderr in red
+  p[stream].on 'close', -> process.exit 0
   p[stream].on 'data', (data) ->
     process['stdout'].write "\x1b[01;#{colour}m#{data}\x1b[00m"
-    if data[data.length - 1] is bell then rl.prompt()
-  p[stream].on 'close', -> process.exit 0
-rl = require('readline').createInterface
-  input: process.stdin
-  output: process.stdout
-  completer: (line) -> w = line.replace /^.*([⎕\)]\w*)$/, '$1'; [completions.filter((c) -> !c.indexOf w), w]
-rl.setPrompt '      '
-rl.on 'line', (line) -> p.stdin.write line + '\n'
-rl.on 'close', -> process.stdout.write '\r'; process.exit 0
-rl.prompt()
+    if data[data.length - 1] is bell
+      if !rl
+        rl = readline.createInterface {input: process.stdin, output: process.stdout, completer}
+        rl.setPrompt '      '
+        rl.on 'line', (line) -> p.stdin.write line + '\n'
+        rl.on 'close', -> process.stdout.write '\r'; process.exit 0
+      rl.prompt()
