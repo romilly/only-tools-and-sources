@@ -23,7 +23,7 @@ completions = '''
 '''.split /[ \n]+/
 completer = (line) -> w = line.replace /^.*([⎕\)]\w*)$/, '$1'; [completions.filter((c) -> !c.indexOf w), w]
 
-p = require('child_process').spawn 'apl', ['-q', '-script']
+p = require('child_process').spawn 'dyalog', ['-q', '-script']
 bell = 7 # the Unicode code point that tells us when to show a 6-space prompt
 p.stdin.write "⎕io⎕ct←0⋄⎕pw←32767⋄{}8835⌶2 #{bell}\n"
 readline = require 'readline'
