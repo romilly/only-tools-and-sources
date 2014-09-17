@@ -2,9 +2,9 @@
 ⍝ An interpreter for a small subset of Scheme,
 ⍝ loosely following the structure of the metacircular evaluator from SICP
 ⍝ https://www.youtube.com/watch?v=0m6hoOelZH8
-⍝
 ⍝ Runs on Dyalog v14.0
-⍝
+⍝ Featured in Dyalog's collection of dfns: https://dfns.dyalog.com/n_lisp.htm
+
 ⍝ Lisp   APL
 ⍝ ----   ---
 ⍝ 123    123
