@@ -79,7 +79,7 @@ eval←{ ⍝ ⍺: environment, ⍵: expression
   isAtom⍵:⊃⍺[⍺[;0]⍳⊂⍵;1]
   0≡≢⍵:⍬
   'quote'≡⊃⍵:⊃⍵[1]
-  'lambda'≡⊃⍵:('closure'⍺),1↓⍵
+  ((,'\')≡⊃⍵)∨'lambda'≡⊃⍵:('closure'⍺),1↓⍵
   'cond'≡⊃⍵:⍺evcond 1↓⍵
   (⍺∇⊃⍵)apply(⊂⍺)∇¨1↓⍵
 }
@@ -92,7 +92,7 @@ apply←{ ⍝ ⍺: procedure, ⍵: arguments
 evcond←{ ⍝ ⍺: environment, ⍵: clauses
   0≡≢⍵:⍬
   'else'≡⊃⊃⍵:⍺eval⊃1↓⊃⍵
-  0≢⍺eval⊃⊃⍵:⍺∇1↓⍵
+  0≡⍺eval⊃⊃⍵:⍺∇1↓⍵
   ⍺eval⊃1↓⊃⍵
 }
 
@@ -100,6 +100,7 @@ evcond←{ ⍝ ⍺: environment, ⍵: clauses
 env0←⍉⍪ (,'+')  (,⊂'+/')
 env0⍪←  (,'-')  (,⊂'-/')
 env0⍪←  (,'*')  (,⊂'×/')
+env0⍪←  (,'=')  (,⊂'=/')
 env0⍪←  'write' (,⊂'⎕←')
 
 exec←{
