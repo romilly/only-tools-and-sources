@@ -1,5 +1,9 @@
 ⍝ a JSON parser
-⍝
+
+⍝ For a faster, native way to parse and serialise JSON, see
+⍝ 7159⌶ http://help.dyalog.com/15.0/Content/Language/Primitive%20Operators/JSON%20Import.htm
+⍝ 7160⌶ http://help.dyalog.com/15.0/Content/Language/Primitive%20Operators/JSON%20Export.htm
+
 ⍝ usage:
 ⍝   json←import'json.dyalog'
 ⍝   json.parse'{"abc": [123, true, null, [], {}]}'
